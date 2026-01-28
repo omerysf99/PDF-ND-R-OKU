@@ -2,115 +2,171 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>345 Deneme Portalı</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Telegram Game Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #6366f1; --bg: #f8fafc; }
-        body { font-family: 'Inter', sans-serif; margin: 0; background: var(--bg); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        .content { flex: 1; padding: 20px; overflow-y: auto; padding-bottom: 90px; }
-        section { display: none; }
-        section.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .card { background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        .btn-download { background: var(--primary); color: white; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .btn-download:active { transform: scale(0.98); opacity: 0.9; }
-        .nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; border-top: 1px solid #eee; padding: 10px 0; }
-        .nav-item { flex: 1; text-align: center; color: #94a3b8; font-size: 12px; cursor: pointer; }
-        .nav-item.active { color: var(--primary); font-weight: bold; }
-        .pdf-box { background: #f1f5f9; padding: 15px; border-radius: 10px; margin: 15px 0; border-left: 4px solid var(--primary); }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #ffffff;
+            color: #333;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn-blue {
+            background-color: #00bcd4;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .admin-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        /* Gizli içerik sınıfı */
+        .owner-only {
+            display: none;
+        }
     </style>
 </head>
-<body>
+<body class="max-w-md mx-auto pb-20">
 
-    <div class="content">
-        <section id="home" class="active">
-            <div class="card">
-                <h1>FAVORİ PDF</h1>
-                <p>345 Yayınları Erken Erişim Denemesi yayında! PDF'ler sekmesinden reklam izleyerek indirebilirsiniz.</p>
-            </div>
-        </section>
+    <!-- Header -->
+    <header class="flex items-center justify-between p-4 bg-white sticky top-0 z-50 border-b border-gray-50">
+        <div class="flex items-center gap-2">
+            <i class="fas fa-chevron-left text-gray-400"></i>
+            <span class="font-medium text-gray-700" id="user-name">Yükleniyor...</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <button onclick="openAdmin()" class="text-gray-300">
+                <i class="fas fa-cog"></i>
+            </button>
+        </div>
+    </header>
 
-        <section id="pdfs">
-            <div class="card">
-                <h3>PDF Kütüphanesi</h3>
-                <div class="pdf-box">
-                    <strong>📄 tgerkenerisim345endenemetgtyt_2025_2026(1).pdf</strong>
-                    <p style="margin: 5px 0 0; font-size: 12px; color: #64748b;">Boyut: Standart PDF</p>
-                </div>
-                
-                <button class="btn-download" onclick="reklamliIndir()">
-                    🎬 Reklam İzle ve İndir
-                </button>
-            </div>
-        </section>
-
-        <section id="profile">
-            <div class="card">
-                <h3>Profil İstatistikleri</h3>
-                <div style="font-size: 1.1rem; line-height: 2;">
-                    <div>İndirilen PDF: <strong id="stat-count">0</strong></div>
+    <!-- SADECE SAHİBİNE GÖZÜKECEK ALAN -->
+    <div id="private-content" class="owner-only px-4 mt-4">
+        
+        <!-- Banner Alanı -->
+        <div class="mb-6">
+            <h2 class="text-xs font-bold text-gray-400 mb-2 uppercase tracking-widest">Öne Çıkan</h2>
+            <div class="relative rounded-2xl overflow-hidden shadow-lg border border-gray-100">
+                <img src="https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80&w=1000&auto=format&fit=crop" class="w-full h-44 object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-4">
+                    <span class="text-white font-bold text-lg">Cyber Strike 2077</span>
+                    <p class="text-gray-200 text-xs">Yeni nesil savaş deneyimi başladı.</p>
                 </div>
             </div>
-        </section>
+        </div>
+
+        <!-- Yeni Oyunlar Sekmesi -->
+        <div class="mb-8">
+            <div class="flex justify-between items-end mb-4">
+                <h2 class="text-xl font-bold">Yeni Oyunlar</h2>
+                <span class="text-cyan-500 text-sm font-medium">Tümünü Gör</span>
+            </div>
+            
+            <div id="games-container" class="space-y-6">
+                <!-- Dinamik Oyunlar -->
+            </div>
+        </div>
+
     </div>
 
-    <nav class="nav">
-        <div class="nav-item active" onclick="tab('home', this)">🏠<br>Ana Ekran</div>
-        <div class="nav-item" onclick="tab('pdfs', this)">📄<br>PDF'ler</div>
-        <div class="nav-item" onclick="tab('profile', this)">👤<br>Profilim</div>
-    </nav>
+    <!-- YETKİSİZ KULLANICI MESAJI -->
+    <div id="access-denied" class="hidden flex flex-col items-center justify-center h-[70vh] px-10 text-center">
+        <i class="fas fa-user-shield text-6xl text-gray-200 mb-4"></i>
+        <h2 class="text-xl font-bold text-gray-400">Erişim Kısıtlı</h2>
+        <p class="text-gray-400 text-sm mt-2">Bu uygulamadaki içerikler sadece yöneticiye özeldir.</p>
+    </div>
+
+    <!-- Admin Paneli -->
+    <div id="adminPanel" class="admin-modal">
+        <div class="bg-white w-11/12 max-w-sm rounded-2xl p-6">
+            <h2 class="text-xl font-bold mb-4">Yönetici Girişi</h2>
+            <input id="adminPass" type="password" class="w-full border p-3 rounded-xl mb-4 text-center" placeholder="Şifre (123456)">
+            <div class="flex gap-2">
+                <button onclick="closeAdmin()" class="flex-1 py-3 text-gray-500">Kapat</button>
+                <button onclick="checkPass()" class="flex-1 bg-cyan-500 text-white py-3 rounded-xl font-bold">Giriş Yap</button>
+            </div>
+        </div>
+    </div>
 
     <script>
-        // Sayfa Geçişleri
-        function tab(id, el) {
-            document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            el.classList.add('active');
-        }
+        const OWNER_ID = 8392479231; // Senin ID'n
+        const tg = window.Telegram.WebApp;
 
-        // İstatistikleri Yükle
-        let count = parseInt(localStorage.getItem('pdf_downloads')) || 0;
-        document.getElementById('stat-count').innerText = count;
+        // Varsayılan Oyun Verileri
+        let games = [
+            { id: 1, name: "Pixel Quest", desc: "Retro macera seni bekliyor", emoji: "👾", link: "#" },
+            { id: 2, name: "Galactic Miner", desc: "TON madenciliği simülatörü", emoji: "🚀", link: "#" },
+            { id: 3, name: "Neon Runner", desc: "Hızlı refleks, yüksek puan", emoji: "🏃", link: "#" }
+        ];
 
-        // --- REKLAM VE İNDİRME MANTIĞI ---
-        function reklamliIndir() {
-            // Fonksiyonun yüklendiğinden emin oluyoruz
-            if (typeof show_10371617 === 'function') {
-                
-                // Senin gönderdiğin Reklam Kodu
-                show_10371617('pop').then(() => {
-                    // Reklam başarıyla izlendiğinde ödül olarak indirme başlar
-                    pdfDosyasiniIndir();
-                }).catch(e => {
-                    // Reklamda hata oluşursa veya kullanıcı kapatırsa
-                    alert("Reklam tamamlanamadı. Lütfen indirmek için reklamı izleyin.");
-                    console.error("Reklam Hatası:", e);
-                });
+        function initApp() {
+            tg.expand(); // Ekranı tam boy yap
+            
+            const user = tg.initDataUnsafe?.user;
+            const currentUserId = user?.id;
+            const userName = user ? (user.first_name + (user.last_name ? ' ' + user.last_name : '')) : "Misafir";
+            
+            document.getElementById('user-name').innerText = userName;
 
+            // ID Kontrolü
+            if (currentUserId === OWNER_ID) {
+                document.getElementById('private-content').style.display = 'block';
+                renderGames();
             } else {
-                // Eğer SDK yüklenmemişse kullanıcıya ve sana bilgi verir
-                alert("Sistem Hatası: Reklam kütüphanesi (SDK) yüklenemedi. Lütfen internetinizi kontrol edin veya reklam kodunu (script tag) eklediğinizden emin olun.");
+                document.getElementById('access-denied').classList.remove('hidden');
             }
         }
 
-        function pdfDosyasiniIndir() {
-            const fileName = "tgerkenerisim345endenemetgtyt_2025_2026(1).pdf";
-            const link = document.createElement('a');
-            link.href = fileName;
-            link.download = fileName;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-
-            // Veriyi Kaydet
-            count++;
-            localStorage.setItem('pdf_downloads', count);
-            document.getElementById('stat-count').innerText = count;
+        function renderGames() {
+            const container = document.getElementById('games-container');
+            if (localStorage.getItem('tgGames')) {
+                games = JSON.parse(localStorage.getItem('tgGames'));
+            }
             
-            alert("Reklam izlendi, indirme başlıyor!");
+            container.innerHTML = '';
+            games.forEach(game => {
+                container.innerHTML += `
+                    <div class="flex items-center justify-between animate-fade-in">
+                        <div class="flex items-center gap-3">
+                            <div class="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center text-3xl shadow-sm border border-gray-100">${game.emoji}</div>
+                            <div>
+                                <h3 class="font-bold text-gray-800">${game.name}</h3>
+                                <p class="text-gray-400 text-xs">${game.desc}</p>
+                            </div>
+                        </div>
+                        <button onclick="window.location.href='${game.link}'" class="btn-blue">Başlangıç</button>
+                    </div>
+                `;
+            });
         }
+
+        // Admin Modalı Fonksiyonları
+        function openAdmin() { document.getElementById('adminPanel').style.display = 'flex'; }
+        function closeAdmin() { document.getElementById('adminPanel').style.display = 'none'; }
+        
+        function checkPass() {
+            if(document.getElementById('adminPass').value === '123456') {
+                alert('Yönetici yetkisi aktif. (Buradan oyun ekleme/silme fonksiyonlarını daha sonra geliştirebilirsin)');
+                closeAdmin();
+            } else {
+                alert('Hatalı şifre!');
+            }
+        }
+
+        // Uygulamayı başlat
+        window.onload = initApp;
     </script>
 </body>
 </html>
